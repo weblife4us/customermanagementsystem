@@ -10,9 +10,11 @@ public class HelloWorldController {
     @RequestMapping(value = "/hello", method = RequestMethod.GET)
 
     public String getHelloWorldMessage() {
+
         return "<div style=\"text-align:center;\">" + "<h1>Hello world</h1>"
                 + "<p> This is my first springboot page test </p>"
                 + "</div>";
+
     }
 
 }
