@@ -1,13 +1,13 @@
-package com.project.basic;
+package com.go2it.frame;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class HelloworldApplication {
+public class ApplicationStarter {
 
     public static void main(String[] args) {
-        SpringApplication.run(HelloworldApplication.class, args);
+        SpringApplication.run(ApplicationStarter.class, args);
     }
 
 }
