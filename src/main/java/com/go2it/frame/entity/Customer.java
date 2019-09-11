@@ -4,46 +4,56 @@ import java.time.LocalDate;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
 
-import org.springframework.data.annotation.Id;
+import com.go2it.frame.config.converter.PersonTypeConverter;
+import com.go2it.frame.config.converter.StringToIntAttributeConverter;
 
 /**
  * @author Alex Ryzhkov
  */
 @Entity
+@Table(name = "Persons", uniqueConstraints = { @UniqueConstraint(columnNames = { "PID" }) })
 public class Customer {
-	//TODO clarify ID
-	@Id @GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "id", updatable = false, nullable = false) private int id;
-	@Column(name = "PID", updatable = false, nullable = false, unique = true) private String personId;
+	//TODO clarify whether ID is required
+	//	@GeneratedValue(strategy = GenerationType.AUTO) @Column(name = "id", updatable = false, nullable = false) private int id;
+	@Transient private int id;
+	@Id @Column(name = "PID", updatable = false, nullable = false, unique = true) private String personId;
 	@Column(name = "PName", nullable = false) private String name;
-	@Column(name = "PAddress") private String address;
+	@Column(name = "PAddress", nullable = false) private String address;
 	//TODO clarify the best way to do it
 	@Column(name = "PICHID", nullable = false) private String personInChargeId;
-	@Column(name = "PPhone") private String phoneNumber;
+	@Column(name = "PPhone", nullable = false) private String phoneNumber;
 	@Column(name = "PEmail") private String email;
-	@Column(name = "DOBDOI") private LocalDate dateOfBirth;
-	@Column(name = "Gender") private Type type;
-	@Column(name = "Authorization") private boolean hasProvidedAuthorization;
-	@Column(name = "Gone") private boolean isActiveClient;
-	@Column(name = "T1Done") private int yearT1Done;
+	@Column(name = "DOBDOI", nullable = false) private LocalDate dateOfBirth;
+	//to preserve the String value of enum (default ordinal)
+	@Column(name = "Gender", nullable = false) @Convert(converter = PersonTypeConverter.class) private Type type;
+
+	@Column(name = "Auth") @org.hibernate.annotations.Type(type = "numeric_boolean") private boolean hasProvidedAuthorization;
+	@Column(name = "Gone") @org.hibernate.annotations.Type(type = "numeric_boolean") private boolean isActiveClient;
+	@Column(name = "T1Done", length = 4) @Convert(converter = StringToIntAttributeConverter.class) private int yearT1Done;
 	//TODO clarify what does it stand for
 	@Column(name = "PEmailC") private String corporationEmail;
 	@Column(name = "T2Books") private LocalDate t2Books;
 	@Column(name = "FName") private String fullName;
-	@Column(name = "MStatus") private MaritalStatus maritalStatus;
-	@Column(name = "Citizen") private boolean isCitizen;
+	@Column(name = "MStatus", nullable = false) @Enumerated(EnumType.STRING) private MaritalStatus maritalStatus;
+	@Column(name = "Citizen", nullable = false) @org.hibernate.annotations.Type(type = "numeric_boolean") private boolean isCitizen;
 	//TODO clarify what it is
-	@Column(name = "DepQty") private byte numberOfDependants;
+	@Column(name = "DepQty") private Short numberOfDependants;
 	//TODO check cascade
 	@OneToOne(cascade = CascadeType.ALL) @JoinColumn(name = "SPID", referencedColumnName = "PID") private Customer spouse;
 	@Column(name = "LoginName") private String loginName;
 	@Column(name = "LoginPW") private String password;
-	@Column(name = "WebAccess") private boolean hasWebAccess;
+	@Column(name = "WebAccess", columnDefinition = "boolean false") @org.hibernate.annotations.Type(type = "numeric_boolean") private boolean hasWebAccess;
 
 	public int getId() {
 		return id;
@@ -181,11 +191,11 @@ public class Customer {
 		isCitizen = citizen;
 	}
 
-	public byte getNumberOfDependants() {
+	public short getNumberOfDependants() {
 		return numberOfDependants;
 	}
 
-	public void setNumberOfDependants(byte numberOfDependants) {
+	public void setNumberOfDependants(Short numberOfDependants) {
 		this.numberOfDependants = numberOfDependants;
 	}
 
@@ -221,7 +231,7 @@ public class Customer {
 		this.hasWebAccess = hasWebAccess;
 	}
 
-	private enum Type {
+	public enum Type {
 		MALE("Male"), FEMALE("Female"), CORPORATION("Corporation");
 
 		private String title;
@@ -234,7 +244,7 @@ public class Customer {
 			return title;
 		}
 
-		public Type getByTitle(String title) {
+		public static Type getByTitle(String title) {
 			for (Type type : Type.values()) {
 				if (type.getTitle().equals(title)) {
 					return type;
@@ -244,7 +254,7 @@ public class Customer {
 		}
 	}
 
-	enum MaritalStatus {
+	public enum MaritalStatus {
 		MARRIED("Married"), COMMON_LAW("Common-law"), WIDOWED("Widowed"), DIVORCED("Divorced"), SEPARATED(
 				"Separated"), SINGLE("Sngle");
 
@@ -258,7 +268,7 @@ public class Customer {
 			return title;
 		}
 
-		public MaritalStatus getByTitle(String title) {
+		public static MaritalStatus getByTitle(String title) {
 			for (MaritalStatus type : MaritalStatus.values()) {
 				if (type.getTitle().equals(title)) {
 					return type;
