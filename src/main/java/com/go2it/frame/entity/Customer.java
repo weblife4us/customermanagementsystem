@@ -17,6 +17,7 @@ import javax.persistence.UniqueConstraint;
 
 import org.hibernate.validator.constraints.Length;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.go2it.frame.config.converter.PersonTypeConverter;
 import com.go2it.frame.config.converter.StringToIntAttributeConverter;
 
@@ -56,7 +57,7 @@ public class Customer {
 	//TODO check cascade
 	@OneToOne(cascade = CascadeType.ALL) @JoinColumn(name = "SPID", referencedColumnName = "PID") private Customer spouse;
 	@Column(name = "LoginName", length = 64) @Length(max = 64) private String loginName;
-	@Column(name = "LoginPW", length = 64) @Length(max = 64) private String password;
+	@Column(name = "LoginPW", length = 64) @Length(max = 64) @JsonIgnore private String password;
 	@Column(name = "WebAccess", columnDefinition = "boolean") @org.hibernate.annotations.Type(type = "numeric_boolean") private boolean hasWebAccess;
 
 	public int getId() {
@@ -195,7 +196,7 @@ public class Customer {
 		isCitizen = citizen;
 	}
 
-	public short getNumberOfDependants() {
+	public Short getNumberOfDependants() {
 		return numberOfDependants;
 	}
 
