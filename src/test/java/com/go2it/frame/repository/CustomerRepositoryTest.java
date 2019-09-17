@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,6 +15,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import com.go2it.frame.entity.Customer;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Testing on PROD DB
@@ -35,8 +37,9 @@ public class CustomerRepositoryTest {
 	@DisplayName("Customer can be successfully fetched from DB")
 	@Test
 	public void testCustomerFetch() {
-		Customer customer = customerRepository_.findByName("Joe Doe 1");
-		assertNotNull(customer);
+		Optional<Customer> customer = customerRepository_.findByName("Joe Doe 1");
+		assertTrue(customer.isPresent());
+		assertNotNull(customer.get());
 	}
 
 	private List<Customer> seedCustomers() {
